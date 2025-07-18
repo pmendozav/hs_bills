@@ -1,65 +1,10 @@
-from .scene import Scene
+from ..scene import Scene
+from . import bill_scene_types as types
 
-class TimelineStageGroup:
-    def __init__(self, meta=None, line=None, text=None, red=None):
-        self.meta = meta
-        self.line = line
-        self.text = text
-        self.red = red
-
-class TextGroup:
-    def __init__(self, meta=None, text=None):
-        self.meta = meta
-        self.text = text
-        
-class BulletGroup:
-    def __init__(self, meta=None, text=None):
-        self.meta = meta
-        self.text = text
-        
-class TimelineGroup:
-    def __init__(self, title=None, upcoming_text=None, stages=[]):
-        self.title = title
-        self.upcoming_text = upcoming_text
-        self.stages = stages
-
-class BillBlockGroup:
-    def __init__(self, index=0, background=None, outro_animation=None, outro_audio=None, title=None, audio=None, bullets=[], timeline=TimelineGroup()):
-        self.index = index
-
-        self.background = background
-        self.outro_animation = outro_animation
-        self.outro_audio = outro_audio
-        self.title = title
-        self.bullets = bullets
-        self.timeline = timeline
-        self.audio = audio
-
-class BillSceneElements:
-    def __init__(self):
-        self.opening = {}
-        self.closing = {}
-        self.blocks = []
-
-    def set_opening(self, bg, outro_animation, outro_audio):
-        self.opening = {
-            "background": bg,
-            "outro_animation": outro_animation,
-            "outro_audio": outro_audio
-        }
-        
-    def set_closing(self, bg, audio):
-        self.closing = {
-            "background": bg,
-            "audio": audio
-        }
-        
-    def set_blocks(self, blocks):
-        self.blocks = blocks
 
 class BillScene(Scene):
     def __init__(self, scene=None, n_blocks=1):
-        self.elements = BillSceneElements()
+        self.elements = types.BillSceneElements()
         
         super().__init__(scene=scene, n_blocks=n_blocks)
         
@@ -95,7 +40,7 @@ class BillScene(Scene):
         # extract elements
         background = next((s for s in strips if s.name == f"group.{index}.background"), None)
         audio = next((s for s in strips if s.name == f"group.{index}.audio"), None)
-        title = TextGroup(
+        title = types.TextGroup(
             meta=next((s for s in strips if s.name == f"group.{index}.title"), None),
             text=next((s for s in strips if s.name == f"group.{index}.title.text"), None)
         )
@@ -105,14 +50,14 @@ class BillScene(Scene):
         
         bullets = []
         for i in range(1, 4):
-            bulletGroup = BulletGroup(
+            bulletGroup = types.BulletGroup(
                 meta=next((s for s in bullet_strips if s.name == f"group.{index}.bullet.{i}"), None),
                 text=next((s for s in bullet_strips if s.name == f"group.{index}.bullet.{i}.text"), None)
             )
             bullets.append(bulletGroup)
         
         # timeline elements
-        timeline_title = TextGroup(
+        timeline_title = types.TextGroup(
             meta=next((s for s in timeline_strips if s.name == f"group.{index}.timeline.title"), None),
             text=next((s for s in timeline_strips if s.name == f"group.{index}.timeline.title.text"), None)
         )
@@ -125,15 +70,15 @@ class BillScene(Scene):
             text = next((s for s in timeline_strips if s.name == f"group.{index}.timeline.stage.{i}.text"), None)
             red = next((s for s in timeline_strips if s.name == f"group.{index}.timeline.stage.{i}.red"), None)
             
-            stage = TimelineStageGroup(meta=meta, line=line, text=text, red=red)
+            stage = types.TimelineStageGroup(meta=meta, line=line, text=text, red=red)
             stages.append(stage)
-        timeline = TimelineGroup(
+        timeline = types.TimelineGroup(
             title=timeline_title,
             upcoming_text=upcoming_text,
             stages=stages
         )
 
-        billBlock = BillBlockGroup(
+        billBlock = types.BillBlockGroup(
             index=index,
             background=background,
             audio=audio,

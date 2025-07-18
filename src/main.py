@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from blender.helper import BlenderFile
-from blender.bill_scene import BillScene
+from blender.scenes.bill_scene.bill_scene import BillScene
 
 import debugpy
 
