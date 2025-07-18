@@ -10,13 +10,6 @@ class BillScene(Scene):
     def render(self, output_path):
         pass
     
-    def parse(self, scene=None):
-        super().parse(scene)
-        
-        self.parse_opening_strips()
-        self.parse_closing_strips()
-        self.parse_block_strips()
-
     def parse_opening_strips(self):
         super().parse_opening_strips()
         pass

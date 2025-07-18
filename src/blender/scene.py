@@ -3,9 +3,9 @@ import bpy
 class Scene:
     def __init__(self, scene=None, n_blocks=1):
         self.scene = scene
+        self.name = scene.name if scene else "unknown"
         self.strips_by_type = {}
         self.all_strips = []
-        self.meta_strips = []
         self.n_blocks = n_blocks
 
         self.parse()
@@ -23,8 +23,6 @@ class Scene:
 
         self.strips_by_type = {}
         self.all_strips = []
-        self.meta_strips = []
-
 
         sequence_editor = scene.sequence_editor
         if not sequence_editor:
@@ -34,8 +32,10 @@ class Scene:
             self.all_strips.append(seq)
             strip_type = seq.type
             self.strips_by_type.setdefault(strip_type, []).append(seq)
-            if strip_type == 'META':
-                self.meta_strips.append(seq)
+        
+        self.parse_opening_strips()
+        self.parse_closing_strips()
+        self.parse_block_strips()
 
     def get_image_strips(self):
         return self.strips_by_type.get('IMAGE', [])
@@ -47,7 +47,7 @@ class Scene:
         return self.strips_by_type.get('MOVIE', [])
 
     def get_meta_strips(self):
-        return self.meta_strips
+        return self.strips_by_type.get('META', [])
     
     def get_strip_by_id(self, strip_id):
        for strip in self.all_strips:
@@ -61,10 +61,10 @@ class Scene:
     def parse_closing_strips(self):
         pass
 
-    def parse_one_block(self, index):
+    def parse_one_block_strips(self, index):
         pass
     
-    def parse_blocks(self):
+    def parse_block_strips(self):
         for index in range(1, self.n_blocks):
             self.parse_one_block_strips(index)
     

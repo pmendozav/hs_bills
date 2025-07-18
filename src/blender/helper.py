@@ -38,3 +38,6 @@ class BlenderFile:
             if seq.type == 'META':
                 return seq
         return None
+    
+    def get_scene(self):
+        return bpy.context.scene
