@@ -39,23 +39,31 @@ def read_and_preprocess_input_data(config=None):
     
     data.get("blocks", [])
     for block in data["blocks"]:
-        # validate mandatory fields: bill_topic, title, summary_bullets (array), bill_flow_origin, current_step (integer), timeline (dict), audio_path
+        # validate mandatory fields: bill_topic, title, summary_bullets (array), bill_process, current_stage_step (integer), timeline (dict), audio_path
         if "bill_topic" not in block:
             raise ValueError("Block is missing 'bill_topic' field.")
         if "title" not in block:
             raise ValueError("Block is missing 'title' field.")
         if "summary_bullets" not in block or not isinstance(block["summary_bullets"], list):
             raise ValueError("Block is missing 'summary_bullets' field or it is not a list.")
-        if "bill_flow_origin" not in block:
-            raise ValueError("Block is missing 'bill_flow_origin' field.")
-        if "current_step" not in block or not isinstance(block["current_step"], int):
-            raise ValueError("Block 'current_step' must be an integer.")
+        if "bill_process" not in block:
+            raise ValueError("Block is missing 'bill_process' field.")
+        if "current_stage_step" not in block or not isinstance(block["current_stage_step"], int):
+            raise ValueError("Block 'current_stage_step' must be an integer.")
         
         # audio duration
         audio_path = block.get("audio_path", None)
         if audio_path is None or not os.path.exists(audio_path):
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
         block["audio_duration"] = len(AudioSegment.from_file(audio_path)) / 1000.0
+        
+        bill_process_key = block.get("bill_process", None)
+        if not bill_process_key:
+            raise ValueError("Block is missing 'bill_process' field.")
+        bill_process_stages = config.get("bill_processes", {}).get(bill_process_key, None)
+        if not bill_process_stages:
+            raise ValueError(f"Bill process '{bill_process_key}' not found in configuration.")
+        block["bill_process_stages"] = bill_process_stages
         
         # background clip
         bill_topic = block.get("bill_topic", None)
