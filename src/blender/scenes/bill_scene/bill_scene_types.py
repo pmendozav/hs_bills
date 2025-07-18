@@ -1,4 +1,4 @@
-
+from ..scene_types import SceneElements
 class TimelineStageGroup:
     def __init__(self, meta=None, line=None, text=None, red=None):
         self.meta = meta
@@ -34,24 +34,22 @@ class BillBlockGroup:
         self.timeline = timeline
         self.audio = audio
 
-class BillSceneElements:
+class BillSceneElements(SceneElements):
     def __init__(self):
-        self.opening = {}
-        self.closing = {}
-        self.blocks = []
+        super().__init__()
 
-    def set_opening(self, bg, outro_animation, outro_audio):
-        self.opening = {
+    def set_opening(self, bg=None, outro_animation=None, outro_audio=None):
+        super().set_opening({
             "background": bg,
             "outro_animation": outro_animation,
             "outro_audio": outro_audio
-        }
+        })
         
-    def set_closing(self, bg, audio):
-        self.closing = {
+    def set_closing(self, bg=None, audio=None):
+        super().set_closing({
             "background": bg,
             "audio": audio
-        }
-        
-    def set_blocks(self, blocks):
-        self.blocks = blocks
+        })
+
+    def set_blocks(self, blocks=None):
+        super().set_blocks(blocks)

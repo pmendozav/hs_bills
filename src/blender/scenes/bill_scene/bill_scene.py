@@ -1,12 +1,13 @@
+from pydub import AudioSegment
+
 from ..scene import Scene
 from . import bill_scene_types as types
 
 
 class BillScene(Scene):
     def __init__(self, scene=None, n_blocks=1):
-        self.elements = types.BillSceneElements()
-        
         super().__init__(scene=scene, n_blocks=n_blocks)
+        self.elements = types.BillSceneElements()
         
     def setup(self):
         pass
@@ -90,12 +91,9 @@ class BillScene(Scene):
         )
         self.elements.blocks.append(billBlock)
 
-    def update_opening_strips(self):
+    def update_closing_strips(self, data=None, config=None, start_frame=0):
         pass
 
-    def update_closing_strips(self):
-        pass
-
-    def update_one_block_strips(self, index, offset=0):
-        last_frame = 0
-        return last_frame
+    def update_one_block_strips(self, index, start_frame=0, data=None, config=None):
+        
+        return start_frame
