@@ -39,6 +39,9 @@ class Scene:
 
     def get_image_strips(self):
         return self.strips_by_type.get('IMAGE', [])
+    
+    def get_text_strips(self):
+        return self.strips_by_type.get('TEXT', [])
 
     def get_audio_strips(self):
         return self.strips_by_type.get('SOUND', [])
@@ -65,7 +68,7 @@ class Scene:
         pass
     
     def parse_block_strips(self):
-        for index in range(1, self.n_blocks):
+        for index in range(1, self.n_blocks + 1):
             self.parse_one_block_strips(index)
     
     def update_strips_data(self):
@@ -74,3 +77,9 @@ class Scene:
         last_frame = 0
         for index in range(1, self.n_blocks):
             last_frame = self.update_one_block_strips(index, last_frame=last_frame)
+            
+    def find_strip_by_name(self, name, strips=None):
+        for strip in (strips if strips else self.all_strips):
+            if getattr(strip, "name", "") == name:
+                return strip
+        return None

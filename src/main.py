@@ -15,7 +15,9 @@ debugpy.wait_for_client()
 if __name__ == "__main__":
     blender_file = BlenderFile()
     blender_file.read(filepath="./assets/blender/Legislative_Watch_Demo1.blend")
-    
-    bill_scene = BillScene(scene=blender_file.get_scene())
+
+    bill_scene = BillScene(scene=blender_file.get_scene(), n_blocks=3)
 
     print("Current scene:", bill_scene.name)
+    print("Sample:", bill_scene.elements.blocks[2].timeline.stages[6].text.text)
+    
