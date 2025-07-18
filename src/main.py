@@ -39,7 +39,7 @@ def read_and_preprocess_input_data(config=None):
     
     data.get("blocks", [])
     for block in data["blocks"]:
-        # validate mandatory fields: bill_topic, title, summary_bullets (array), bill_process, current_stage_step (integer), timeline (dict), audio_path
+        # validate mandatory fields: bill_topic, title, summary_bullets (array), bill_process, bill_process_step (integer), timeline (dict), audio_path
         if "bill_topic" not in block:
             raise ValueError("Block is missing 'bill_topic' field.")
         if "title" not in block:
@@ -48,8 +48,8 @@ def read_and_preprocess_input_data(config=None):
             raise ValueError("Block is missing 'summary_bullets' field or it is not a list.")
         if "bill_process" not in block:
             raise ValueError("Block is missing 'bill_process' field.")
-        if "current_stage_step" not in block or not isinstance(block["current_stage_step"], int):
-            raise ValueError("Block 'current_stage_step' must be an integer.")
+        if "bill_process_step" not in block or not isinstance(block["bill_process_step"], int):
+            raise ValueError("Block 'bill_process_step' must be an integer.")
         
         # audio duration
         audio_path = block.get("audio_path", None)
