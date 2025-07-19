@@ -15,6 +15,10 @@ debugpy.listen(("localhost", 5678))
 print("Waiting for debugger attach...")
 debugpy.wait_for_client()
 
+def save_template(filepath):
+    blender_file = BlenderFile()
+    blender_file.save(filepath)
+
 def read_and_parse_template(filepath):
     blender_file = BlenderFile()
     blender_file.read(filepath=filepath)
@@ -46,10 +50,12 @@ def read_and_preprocess_input_data(config=None):
             raise ValueError("Block is missing 'title' field.")
         if "summary_bullets" not in block or not isinstance(block["summary_bullets"], list):
             raise ValueError("Block is missing 'summary_bullets' field or it is not a list.")
-        if "bill_process" not in block:
+        if "timeline" not in block:
+            raise ValueError("Block is missing 'timeline' field.")
+        if "bill_process" not in block["timeline"]:
             raise ValueError("Block is missing 'bill_process' field.")
-        if "bill_process_step" not in block or not isinstance(block["bill_process_step"], int):
-            raise ValueError("Block 'bill_process_step' must be an integer.")
+        if "bill_process_step" not in block["timeline"]:
+            raise ValueError("Block is missing 'bill_process_step' field.")
         
         # audio duration
         audio_path = block.get("audio_path", None)
@@ -57,13 +63,13 @@ def read_and_preprocess_input_data(config=None):
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
         block["audio_duration"] = len(AudioSegment.from_file(audio_path)) / 1000.0
         
-        bill_process_key = block.get("bill_process", None)
+        bill_process_key = block.get("timeline", {}).get("bill_process", None)
         if not bill_process_key:
             raise ValueError("Block is missing 'bill_process' field.")
         bill_process_stages = config.get("bill_processes", {}).get(bill_process_key, None)
         if not bill_process_stages:
             raise ValueError(f"Bill process '{bill_process_key}' not found in configuration.")
-        block["bill_process_stages"] = bill_process_stages
+        block["timeline"]["bill_process_stages"] = bill_process_stages
         
         # background clip
         bill_topic = block.get("bill_topic", None)
@@ -115,6 +121,10 @@ if __name__ == "__main__":
     scene = read_and_parse_template(filepath=data.get("template", None))
     scene.parse()
     scene.update(data=data, config=config)
+    
+    # TODO: delete this line after testing
+    save_template("./assets/blender/result.blend")
+    
     print("Current scene:", scene.name)
     print("Sample:", scene.elements.blocks[2].timeline.stages[6].text.text)
     

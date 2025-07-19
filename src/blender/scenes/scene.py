@@ -8,6 +8,7 @@ def get_last_frame(strip):
 class Scene:
     def __init__(self, scene=None, n_blocks=1):
         self.scene = scene
+        self.fps = scene.render.fps / scene.render.fps_base
         self.name = scene.name if scene else "unknown"
         self.strips_by_type = {}
         self.all_strips = []
@@ -95,6 +96,7 @@ class Scene:
         last_frame = self.update_opening_strips(data=data, config=config)
         for index in range(1, self.n_blocks):
             last_frame = self.update_one_block_strips(index=index, start_frame=last_frame, data=data, config=config)
+            # return 0
         last_frame = self.update_closing_strips(data=data, config=config, start_frame=last_frame)
         return last_frame
 

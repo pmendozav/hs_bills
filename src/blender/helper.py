@@ -4,6 +4,10 @@ class BlenderFile:
     def __init__(self, filepath=None):
         self.filepath = filepath
 
+    def save(self, filepath=None):
+        bpy.ops.wm.save_mainfile(filepath=filepath)
+        return filepath
+
     def read(self, filepath=None):
         path = filepath or self.filepath
         if path:
