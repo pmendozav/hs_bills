@@ -108,7 +108,6 @@ class BillScene(Scene):
         block_strips = self.elements.blocks[index - 1]
         
         #audio
-        print(f"index {index}")
         audio_path = block_data.get("audio_path")
         block_strips.audio.sound = bpy.data.sounds.load(os.path.expanduser(audio_path))
         self.update_strip_position(block_strips.audio, {
@@ -183,7 +182,6 @@ class BillScene(Scene):
 
         outro_animation_duration = block_strips.outro_animation.frame_final_duration
         frame_start = block_strips.audio.frame_final_end - 17
-        print(index)
         self.update_strip_position(block_strips.outro_animation, {
             "frame_start": frame_start,
             "frame_end": frame_start + block_strips.outro_animation.frame_final_start + outro_animation_duration
