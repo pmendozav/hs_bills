@@ -20,6 +20,30 @@ class Scene:
 
     def render(self, output_path):
         pass
+    
+    def update_strip_position(self, strip, props):
+        if "frame_start" in props:
+            strip.frame_start = props.get("frame_start", 0)
+            strip.frame_final_start = props.get("frame_start", 0)
+            strip.frame_offset_start = 0
+        
+        if "frame_end" in props:
+            strip.frame_final_end = props.get("frame_end", 0)
+            # strip.frame_offset_end = 0
+        
+        if "frame_duration" in props:
+            # strip.frame_duration = props.get("frame_duration", 0)
+            strip.frame_final_duration = props.get("frame_duration", 0)
+            strip.frame_offset_end = 0
+            
+        if "animation_offset_start" in props:
+            strip.animation_offset_start = props.get("animation_offset_start", 0)
+            
+        if "animation_offset_end" in props:
+            strip.animation_offset_end = props.get("animation_offset_end", 0)
+            
+        if "text" in props:
+            strip.text = props.get("text", "")
 
     def parse(self, scene=None):
         scene = scene or self.scene
@@ -94,7 +118,7 @@ class Scene:
     def update(self, data=None, config=None):
         last_frame = 0
         last_frame = self.update_opening_strips(data=data, config=config)
-        for index in range(1, self.n_blocks):
+        for index in range(1, self.n_blocks + 1):
             last_frame = self.update_one_block_strips(index=index, start_frame=last_frame, data=data, config=config)
             # return 0
         last_frame = self.update_closing_strips(data=data, config=config, start_frame=last_frame)

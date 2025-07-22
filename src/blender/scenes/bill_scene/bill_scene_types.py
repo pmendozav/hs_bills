@@ -1,10 +1,11 @@
 from ..scene_types import SceneElements
 class TimelineStageGroup:
-    def __init__(self, meta=None, line=None, text=None, red=None):
+    def __init__(self, meta=None, line=None, text=None, red=None, circle=None):
         self.meta = meta
         self.line = line
         self.text = text
         self.red = red
+        self.circle = circle
 
 class TextGroup:
     def __init__(self, meta=None, text=None):
@@ -12,9 +13,10 @@ class TextGroup:
         self.text = text
         
 class BulletGroup:
-    def __init__(self, meta=None, text=None):
+    def __init__(self, meta=None, text=None, rect=None):
         self.meta = meta
         self.text = text
+        self.rect = rect
         
 class TimelineGroup:
     def __init__(self, title=None, upcoming_text=None, stages=[]):

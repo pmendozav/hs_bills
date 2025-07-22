@@ -89,7 +89,7 @@ def read_and_preprocess_input_data(config=None):
             # validate mandatory fields: text and start_time (int)
             if "text" not in bullet:
                 raise ValueError("Bullet point is missing 'text' field.")
-            if "start_time" not in bullet or not isinstance(bullet["start_time"], int):
+            if "start_time" not in bullet:
                 raise ValueError("Bullet point 'start_time' must be an integer.")
             
             icon_cagetory = bullet.get("icon_category", None)
