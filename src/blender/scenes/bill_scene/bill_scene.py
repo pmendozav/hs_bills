@@ -10,19 +10,12 @@ class BillScene(Scene):
         super().__init__(scene=scene, n_blocks=n_blocks)
         self.elements = types.BillSceneElements()
         
-    def setup(self):
-        pass
-    
-    def render(self, output_path):
-        pass
-    
     def parse_opening_strips(self):
         bg = super().find_strip_by_name(name="opening.background", strips=self.get_movie_strips())
         animation = super().find_strip_by_name(name="opening.outro.animation", strips=self.get_movie_strips())
         audio = super().find_strip_by_name(name="opening.audio", strips=self.get_audio_strips())
 
         self.elements.set_opening(bg, animation, audio)
-
 
     def parse_closing_strips(self):
         bg = super().find_strip_by_name(name="closing.background", strips=self.get_movie_strips())
@@ -93,9 +86,6 @@ class BillScene(Scene):
             timeline=timeline
         )
         self.elements.blocks.append(billBlock)
-
-    def update_closing_strips(self, data=None, config=None, start_frame=0):
-        pass
 
     def update_one_block_strips(self, index, start_frame=0, data=None, config=None):
         start_frame = start_frame + 1

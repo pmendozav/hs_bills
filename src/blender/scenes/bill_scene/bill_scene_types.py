@@ -14,27 +14,28 @@ class TextGroup:
         
 class BulletGroup:
     def __init__(self, meta=None, text=None, rect=None):
-        self.meta = meta
-        self.text = text
-        self.rect = rect
+        self.meta = meta # meta container
+        self.text = text # text displayed in the bullet
+        self.rect = rect # rectangle background for the bullet text
         
 class TimelineGroup:
     def __init__(self, title=None, upcoming_text=None, stages=[]):
-        self.title = title
-        self.upcoming_text = upcoming_text
-        self.stages = stages
+        self.title = title # title text displayed in the timeline
+        self.upcoming_text = upcoming_text # text indicating the upcoming stage date
+        self.stages = stages # list of meta elements for each stage in the timeline
 
 class BillBlockGroup:
     def __init__(self, index=0, background=None, outro_animation=None, outro_audio=None, title=None, audio=None, bullets=[], timeline=TimelineGroup()):
-        self.index = index
+        self.index = index  # Position of the block in the overall scene
 
-        self.background = background
-        self.outro_animation = outro_animation
-        self.outro_audio = outro_audio
-        self.title = title
-        self.bullets = bullets
-        self.timeline = timeline
-        self.audio = audio
+        self.background = background  # Background video clip for the block
+        self.outro_animation = outro_animation  # Animation shown at the end of the block
+        self.outro_audio = outro_audio  # Audio played during the outro animation
+        self.title = title  # Title text displayed in the block
+        self.bullets = bullets  # List of bullet points related to the bill
+        self.timeline = timeline  # Timeline indicating the current stage of the bill
+        self.audio = audio  # Narration voiceover explaining the bill
+
 
 class BillSceneElements(SceneElements):
     def __init__(self):

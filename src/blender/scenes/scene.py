@@ -81,12 +81,6 @@ class Scene:
     def get_meta_strips(self):
         return self.strips_by_type.get('META', [])
     
-    def get_strip_by_id(self, strip_id):
-       for strip in self.all_strips:
-           if getattr(strip, "name", None) == strip_id:
-               return strip
-       return None
-
     def parse_opening_strips(self):
         raise NotImplementedError("This method should be implemented in subclasses")
 
