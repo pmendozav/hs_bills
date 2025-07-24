@@ -100,7 +100,7 @@ class BillScene(Scene):
         #audio
         audio_path = block_data.get("audio_path")
         block_strips.audio.sound = bpy.data.sounds.load(os.path.expanduser(audio_path))
-        self.update_strip_position(block_strips.audio, {
+        self.update_strip_props(block_strips.audio, {
             "frame_start": start_frame,
             "frame_duration": block_strips.audio.frame_duration,
             "animation_offset_start": 0,
@@ -124,7 +124,7 @@ class BillScene(Scene):
         
         # title
         block_strips.title.text.text = block_data.get("title", "")
-        self.update_strip_position(block_strips.title.meta, {
+        self.update_strip_props(block_strips.title.meta, {
             "frame_start": start_frame + 54,
             "frame_end": block_strips.background.frame_final_end
         })
@@ -135,15 +135,15 @@ class BillScene(Scene):
             text = data.get("text", "")
             # icon_category = data.get("icon_category", "unknown_icon_category")
             bullet_frame_start = frame_offset + int(data.get("start_time", 0) * self.fps)
-            self.update_strip_position(ref.meta, {
+            self.update_strip_props(ref.meta, {
                 "frame_start": bullet_frame_start,
                 "frame_end": block_strips.background.frame_final_end
             })
-            self.update_strip_position(ref.text, {
+            self.update_strip_props(ref.text, {
                 "text": text,
                 "frame_end": block_strips.background.frame_final_end
             })
-            self.update_strip_position(ref.rect, {
+            self.update_strip_props(ref.rect, {
                 "frame_end": block_strips.background.frame_final_end
             })
             
@@ -157,22 +157,22 @@ class BillScene(Scene):
         timeline_strips = block_strips.timeline
         
         timeline_strips.title.text.text = timeline_data.get("title", "")
-        self.update_strip_position(timeline_strips.title.meta, {
+        self.update_strip_props(timeline_strips.title.meta, {
             "frame_start": frame_offset,
             "frame_end": block_strips.audio.frame_final_end
         })
         
         next_important_date_text = timeline_data.get("next_important_date_text", None)
         if next_important_date_text is not None:
-            timeline_strips.upcoming_text.text = next_important_date_text
-            timeline_strips.upcoming_text.frame_offset_end = 0
-            timeline_strips.upcoming_text.frame_offset_start = 0
-            timeline_strips.upcoming_text.frame_final_start = frame_offset
-            timeline_strips.upcoming_text.frame_final_end = block_strips.audio.frame_final_end
+            self.update_strip_props(timeline_strips.upcoming_text, {
+                "text": next_important_date_text,
+                "frame_start": frame_offset,
+                "frame_end": block_strips.audio.frame_final_end
+            })
 
         outro_animation_duration = block_strips.outro_animation.frame_final_duration
         frame_start = block_strips.audio.frame_final_end - 17
-        self.update_strip_position(block_strips.outro_animation, {
+        self.update_strip_props(block_strips.outro_animation, {
             "frame_start": frame_start,
             "frame_end": frame_start + block_strips.outro_animation.frame_final_start + outro_animation_duration
         })
@@ -188,24 +188,24 @@ class BillScene(Scene):
             text.text = stage_text
             if index >= timeline_data.get("bill_process_step", 0):
                 red.blend_alpha = 0
-            self.update_strip_position(meta, {
+            self.update_strip_props(meta, {
                 "frame_start": timeline_strips.title.meta.frame_final_start + 17,
                 "frame_end": block_strips.audio.frame_final_end
             })
             
-            self.update_strip_position(red, {
+            self.update_strip_props(red, {
                 "frame_end": block_strips.audio.frame_final_end
             })
             
-            self.update_strip_position(text, {
+            self.update_strip_props(text, {
                 "frame_end": block_strips.audio.frame_final_end
             })
             
-            self.update_strip_position(line, {
+            self.update_strip_props(line, {
                 "frame_end": block_strips.audio.frame_final_end
             })
             
-            self.update_strip_position(circle, {
+            self.update_strip_props(circle, {
                 "frame_end": block_strips.audio.frame_final_end
             })
         

@@ -1,10 +1,20 @@
 import bpy
 
-from .scene_types import SceneElements
+class SceneElements:
+    def __init__(self):
+        self.opening = {}
+        self.closing = {}
+        self.blocks = []
 
-def get_last_frame(strip):
-    return strip.frame_final_end + (strip.frame_final_start if strip.frame_final_start is not None else 0)
-    
+    def set_opening(self, opening):
+        self.opening = opening
+        
+    def set_closing(self, closing):
+        self.closing = closing
+
+    def set_blocks(self, blocks):
+        self.blocks = blocks
+
 class Scene:
     def __init__(self, scene=None, n_blocks=1):
         self.scene = scene
@@ -21,7 +31,10 @@ class Scene:
     def render(self, output_path):
         pass
     
-    def update_strip_position(self, strip, props):
+    def get_last_frame(self, strip):
+        return strip.frame_final_end + (strip.frame_final_start if strip.frame_final_start is not None else 0)
+    
+    def update_strip_props(self, strip, props):
         if "frame_start" in props:
             strip.frame_start = props.get("frame_start", 0)
             strip.frame_final_start = props.get("frame_start", 0)
@@ -98,12 +111,12 @@ class Scene:
     def update_opening_strips(self, data=None, config=None):
         opening = self.elements.opening
         bg = next((strip for strip in opening.values() if "background" in strip.name and strip.type == 'MOVIE'), None)
-        return get_last_frame(bg) if bg else 0
+        return self.get_last_frame(bg) if bg else 0
 
     ''' do not update noghing, only calculate the last frame of all the closing strips '''
     def update_closing_strips(self, data=None, config=None, start_frame=0):
         closing = self.elements.closing
-        last_frame = max(get_last_frame(strip) for strip in closing.values())
+        last_frame = max(self.get_last_frame(strip) for strip in closing.values())
         return last_frame if isinstance(last_frame, int) else 0
 
     def update_one_block_strips(self, index, start_frame=0, data=None, config=None):

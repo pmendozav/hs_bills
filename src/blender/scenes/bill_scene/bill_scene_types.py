@@ -1,4 +1,4 @@
-from ..scene_types import SceneElements
+from ..scene import SceneElements
 class TimelineStageGroup:
     def __init__(self, meta=None, line=None, text=None, red=None, circle=None):
         self.meta = meta
