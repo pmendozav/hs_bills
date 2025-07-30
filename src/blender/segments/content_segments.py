@@ -101,6 +101,11 @@ class ContentSegment(Segment):
             frame_start=frame_start,
             frame_end=timeline_frame_start,
             name=f"background")
+        # outro animation
+        self.background.blend_alpha = 1.0
+        self.background.keyframe_insert(data_path="blend_alpha", frame=timeline_frame_start - 10)
+        self.background.blend_alpha = 0.0
+        self.background.keyframe_insert(data_path="blend_alpha", frame=timeline_frame_start)
         
         # title
         channel = channel + 1
@@ -111,13 +116,15 @@ class ContentSegment(Segment):
             frame_start=frame_start + 50,
             frame_end=timeline_frame_start
         )
+        # outro animation
+        self.add_fade_out_animation(self.title, timeline_frame_start)
+        self.add_shift_x_animation(strip=self.title, slide_from_left=False)
         
         # bullets
         self.bullets = []
         for index, bullet in enumerate(data["summary_bullets"]):
             text = bullet["text"]
             frame_start = frame_start_offset + int(bullet["start_time"] * self.fps)
-            print(f"frame_start={frame_start}. timeline_frame_start={timeline_frame_start}")
             channel = channel + 1
             strip = self.create_bullet(
                 name=f"bullet.{index}",
@@ -127,8 +134,17 @@ class ContentSegment(Segment):
                 frame_end=timeline_frame_start,
                 index=index
                 )
+            
+            # intro animation
+            strip.blend_alpha = 0.0
+            strip.keyframe_insert(data_path="blend_alpha", frame=strip.frame_final_start)
+            strip.blend_alpha = 1.0
+            strip.keyframe_insert(data_path="blend_alpha", frame=strip.frame_final_start + 8)
+            
+            # outro animation
+            self.add_fade_out_animation(strip, timeline_frame_start)
+            
             self.bullets.append(strip)
-            # TODO: add animation
         
         channel = channel + 1
         stages = timeline_data["bill_process_stages"]
@@ -186,8 +202,39 @@ class ContentSegment(Segment):
         self.frame_end = self.audio.frame_final_end
         self.last_channel = channel
         
+    def add_fade_out_animation(self, strip, frame_start):
+        strip.blend_alpha = 1.0
+        strip.keyframe_insert(data_path="blend_alpha", frame=frame_start - 10)
+        strip.blend_alpha = 0.0
+        strip.keyframe_insert(data_path="blend_alpha", frame=frame_start)
+        
+    def add_shift_x_animation(self, strip, frame_start=None, fade_duration=7, slide_from_left=True):
+        if frame_start is None:
+            frame_start = strip.frame_final_start
+        
+        frame_end = frame_start + fade_duration
+        
+        original_offset_x = strip.transform.offset_x
+        
+        width = 1280
+        image_name = strip.elements[0].filename
+        image = bpy.data.images.get(image_name)
+        if image:
+            width = image.size[0] * strip.transform.scale_x
+        
+        offset = (1280 + width) / 2
+        if (slide_from_left):
+            offset = -offset
+        
+        
+        strip.transform.offset_x = offset
+        strip.transform.keyframe_insert(data_path="offset_x", frame=frame_start)
+        strip.transform.offset_x = original_offset_x
+        strip.transform.keyframe_insert(data_path="offset_x", frame=frame_end)
+        
+        
     def create_timeline_title(self, data, name, channel, frame_start, frame_end):
-        return self.render_text_rect_asset(
+        strip = self.render_text_rect_asset(
             scene=next(s for s in bpy.data.scenes if s.name == "timeline_title"),
             text=data["text"],
             name=name,
@@ -196,6 +243,9 @@ class ContentSegment(Segment):
             frame_end=frame_end,
             position=[-300, 220]
         )
+        
+        self.add_shift_x_animation(strip=strip)
+        return strip
     
     def create_hearing_date(self, frame_start, frame_end, text, channel):
         strip = self.new_text_strip(
@@ -213,6 +263,8 @@ class ContentSegment(Segment):
         
         strip.transform.offset_x = 64
         strip.transform.offset_y = -214
+        
+        self.add_shift_x_animation(strip=strip)
     
     def create_timeline_stage(self, stages, current_stage_index, channel, frame_start, frame_duration, name):
         # clone the original scene
