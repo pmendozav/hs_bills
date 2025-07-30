@@ -152,4 +152,9 @@ if __name__ == "__main__":
     scene.create_scene(data=input)
     
     blender_file.save("./assets/blender/result.blend")
+    blender_file.render(
+        scene=scene.scene,
+        frame_end=scene.frame_end,
+        output_path="./assets/blender/result.mp4"
+    )
     
