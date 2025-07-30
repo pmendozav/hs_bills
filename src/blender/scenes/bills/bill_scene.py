@@ -8,6 +8,8 @@ class BillScene:
         self.closing_segment = None
         self.content_segments = []
         self.n_block_segments = 0
+        
+        self.frame_end = 0
     
     def create_scene(self, data):
         # blue background
@@ -50,4 +52,18 @@ class BillScene:
                 
         self.closing_segment = ClosingSegment(scene=self.scene, data=data["closing"], channel=channel, frame_start=frame_current)
         
+        # extra elements
+        strip = self.scene.sequence_editor.sequences.new_sound(
+            name=f"global.background_audio",
+            filepath=data["globals"]["audio_path"],
+            channel=self.closing_segment.last_channel + 1,
+            frame_start=1
+        )
+        strip.volume = 0.3
+        strip.frame_final_end = frame_current
+        
         self.blue_background.frame_final_end = self.closing_segment.frame_end
+        
+        self.frame_end = self.closing_segment.frame_end
+        
+        self.scene.frame_end = self.closing_segment.frame_end

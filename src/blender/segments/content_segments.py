@@ -35,6 +35,36 @@ class ClosingSegment(Segment):
             frame_start=frame_start, 
             name="background",
             has_audio=True)
+        
+        # Insert the clip and audio used for the intro sequence
+        channel = channel + 1
+        self.new_clip_strip(
+            bg_path=data.get("break_assets", {}).get("background_path", None),
+            channel=channel,
+            frame_start=frame_start - 14,
+            name="break_video",
+        )
+        channel = channel + 1
+        self.new_audio_strip(
+            data={
+                "filepath": data.get("break_assets", {}).get("audio_path", None)
+            },
+            channel=channel,
+            frame_start=frame_start - 7,
+            name="break_audio",
+        )
+        
+        # extra audio
+        channel = channel + 1
+        self.new_audio_strip(
+            data={
+                "filepath": data.get("break_assets", {}).get("sting_path", None)
+            },
+            channel=channel,
+            frame_start=frame_start - 7,
+            name="break_sting",
+        )
+        
         self.frame_end = self.background.frame_final_end
         self.last_channel = channel
 
@@ -100,8 +130,6 @@ class ContentSegment(Segment):
             self.bullets.append(strip)
             # TODO: add animation
         
-        
-        # timeline
         channel = channel + 1
         stages = timeline_data["bill_process_stages"]
         current_stage_index = timeline_data["bill_process_step"]
@@ -136,6 +164,24 @@ class ContentSegment(Segment):
                 text=hearing_date_data["text"],
                 channel=channel
             )
+        
+        # Insert the clip and audio used for the intro sequence
+        channel = channel + 1
+        self.new_clip_strip(
+            bg_path=data.get("break_assets", {}).get("background_path", None),
+            channel=channel,
+            frame_start=self.audio.frame_final_start - 14,
+            name="break_video",
+        )
+        channel = channel + 1
+        self.new_audio_strip(
+            data={
+                "filepath": data.get("break_assets", {}).get("audio_path", None)
+            },
+            channel=channel,
+            frame_start=self.audio.frame_final_start - 7,
+            name="break_audio",
+        )
         
         self.frame_end = self.audio.frame_final_end
         self.last_channel = channel

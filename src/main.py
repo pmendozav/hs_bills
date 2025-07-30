@@ -117,15 +117,28 @@ def read_and_preprocess_input_data():
             if not os.path.exists(icon_path):
                 raise FileNotFoundError(f"Icon file not found for category '{icon_cagetory}': {icon_path}")
             bullet["icon_path"] = icon_path
+            
+        segment["break_assets"] = {
+            "background_path": config["break_assets"]["background"],
+            "audio_path": config["break_assets"]["audio"]
+        }
 
     return {
         "template": config["template"],
         "segments": segments_data,
         "closing": {
-            "background": config["closing_background"]
+            "background": config["closing_background"],
+            "break_assets": {
+                "background_path": config["break_assets"]["background"],
+                "audio_path": config["break_assets"]["audio"],
+                "sting_path": config["break_assets"]["sting"]
+            }
         },
         "opening": {
             "background": config["opening_background"]
+        },
+        "globals": {
+            "audio_path": config["globals"]["audio"]
         }
     }
  
