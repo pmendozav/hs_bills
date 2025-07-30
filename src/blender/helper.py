@@ -44,4 +44,4 @@ class BlenderFile:
         return None
     
     def get_scene(self):
-        return bpy.context.scene
+        return next(s for s in bpy.data.scenes if s.name == "Scene")
