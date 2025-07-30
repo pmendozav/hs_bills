@@ -43,5 +43,5 @@ class BlenderFile:
                 return seq
         return None
     
-    def get_scene(self):
-        return next(s for s in bpy.data.scenes if s.name == "Scene")
+    def get_scene(self, name):
+        return next(s for s in bpy.data.scenes if s.name == name)

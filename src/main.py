@@ -7,7 +7,7 @@ from pydub import AudioSegment
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from blender.helper import BlenderFile
-from blender.scenes.bill_scene.bill_scene import BillScene
+from blender.scenes.bills.bill_scene import BillScene
 
 import debugpy
 
@@ -25,64 +25,79 @@ def read_and_parse_template(filepath):
 
     return BillScene(scene=blender_file.get_scene(), n_blocks=3)
 
-def read_and_preprocess_input_data(config=None):
+def read_and_preprocess_input_data():
     """Read and preprocess input from assets/input.json."""
-    data = None
     input_path = os.path.join(os.path.dirname(__file__), "../assets/input.json")
+    segments_data = None
     with open(input_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    
-    if data is None:
+        segments_data = json.load(f)
+    if segments_data is None:
         raise ValueError("Input data is empty or not found.")
     
-    if config is None:
-        config = read_config()
-        
+    """Read and preprocess config from assets/config.json."""
+    config_path = os.path.join(os.path.dirname(__file__), "../assets/config.json")
+    config = None
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = json.load(f)
     if config is None:
         raise ValueError("Configuration data is empty or not found.")
     
-    data.get("blocks", [])
-    for block in data["blocks"]:
-        # validate mandatory fields: bill_topic, title, summary_bullets (array), bill_process, bill_process_step (integer), timeline (dict), audio_path
-        if "bill_topic" not in block:
-            raise ValueError("Block is missing 'bill_topic' field.")
-        if "title" not in block:
-            raise ValueError("Block is missing 'title' field.")
-        if "summary_bullets" not in block or not isinstance(block["summary_bullets"], list):
-            raise ValueError("Block is missing 'summary_bullets' field or it is not a list.")
-        if "timeline" not in block:
-            raise ValueError("Block is missing 'timeline' field.")
-        if "bill_process" not in block["timeline"]:
-            raise ValueError("Block is missing 'bill_process' field.")
-        if "bill_process_step" not in block["timeline"]:
-            raise ValueError("Block is missing 'bill_process_step' field.")
+    for segment in segments_data:
+        if "bill_topic" not in segment:
+            raise ValueError("Segment is missing 'bill_topic' field.")
+        if "title" not in segment:
+            raise ValueError("Segment is missing 'title' field.")
         
-        # audio duration
-        audio_path = block.get("audio_path", None)
+        # validate bullet points
+        bullets_content = segment.get("summary_bullets", None)
+        if bullets_content is None or not isinstance(bullets_content, list):
+            raise ValueError("Segment is missing 'summary_bullets' field or it is not a list.")
+        for bullet in bullets_content:
+            if "text" not in bullet:
+                raise ValueError("Bullet point is missing 'text' field.")
+            if "start_time" not in bullet or not isinstance(bullet["start_time"], (int, float)):
+                raise ValueError("Bullet point 'start_time' must be an integer or float.")
+            # icon_category is optional, so we don't validate it here
+        
+        # validate timeline
+        if "timeline" not in segment:
+            raise ValueError("Segment is missing 'timeline' field.")
+        timeline_content = segment["timeline"]
+        if "bill_process" not in timeline_content:
+            raise ValueError("Segment is missing 'bill_process' field.")
+        if "bill_process_step" not in timeline_content:
+            raise ValueError("Segment is missing 'bill_process_step' field.")
+        if "title" not in timeline_content:
+            raise ValueError("Segment is missing 'title' field.")
+        if "start_time" not in timeline_content or not isinstance(timeline_content["start_time"], (int, float)):
+            raise ValueError("Segment is missing 'start_time' field or it is not a number.")
+        audio_path = segment.get("audio_path", None)
         if audio_path is None or not os.path.exists(audio_path):
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
-        block["audio_duration"] = len(AudioSegment.from_file(audio_path)) / 1000.0
         
-        bill_process_key = block.get("timeline", {}).get("bill_process", None)
+        # audio duration
+        segment["audio_duration"] = len(AudioSegment.from_file(audio_path)) / 1000.0
+        
+        bill_process_key = segment.get("timeline", {}).get("bill_process", None)
         if not bill_process_key:
-            raise ValueError("Block is missing 'bill_process' field.")
+            raise ValueError("Segment is missing 'bill_process' field.")
         bill_process_stages = config.get("bill_processes", {}).get(bill_process_key, None)
         if not bill_process_stages:
             raise ValueError(f"Bill process '{bill_process_key}' not found in configuration.")
-        block["timeline"]["bill_process_stages"] = bill_process_stages
+        segment["timeline"]["bill_process_stages"] = bill_process_stages
         
         # background clip
-        bill_topic = block.get("bill_topic", None)
+        bill_topic = segment.get("bill_topic", None)
         if bill_topic is None:
-            raise ValueError("Bill topic is missing in the block data.")
+            raise ValueError("Bill topic is missing in the segment data.")
         
         bg_list = config.get("backgrounds", {}).get(bill_topic, [])
         background_path = random.choice(bg_list) if bg_list else None
         if background_path is None or not os.path.exists(background_path):
             raise FileNotFoundError(f"Background file not found for topic '{bill_topic}': {background_path}")
-        block["background_path"] = background_path
+        segment["background_path"] = background_path
 
-        summary_bullets = block.get("summary_bullets", [])
+        summary_bullets = segment.get("summary_bullets", [])
         if not isinstance(summary_bullets, list):
             raise ValueError("Summary bullets should be a list.")
         for bullet in summary_bullets:
@@ -103,29 +118,25 @@ def read_and_preprocess_input_data(config=None):
                 raise FileNotFoundError(f"Icon file not found for category '{icon_cagetory}': {icon_path}")
             bullet["icon_path"] = icon_path
 
-    return data
-
-def read_config():
-    """Read and preprocess config from assets/config.json."""
-    config_path = os.path.join(os.path.dirname(__file__), "../assets/config.json")
-    with open(config_path, "r", encoding="utf-8") as f:
-        config = json.load(f)
-    return config
-
+    return {
+        "template": config["template"],
+        "segments": segments_data,
+        "closing": {
+            "background": config["closing_background"]
+        },
+        "opening": {
+            "background": config["opening_background"]
+        }
+    }
+ 
 if __name__ == "__main__":
-    config = read_config()
     
-    data = read_and_preprocess_input_data()
-    print("Input data:", data)
+    input = read_and_preprocess_input_data()
+    blender_file = BlenderFile()
+    blender_file.read(filepath=input["template"])
+    scene = BillScene(scene=blender_file.get_scene("Scene"))
     
-    scene = read_and_parse_template(filepath=data.get("template", None))
-    scene.parse()
-    scene.update(data=data, config=config)
+    scene.create_scene(data=input)
     
-    # TODO: delete this line after testing
-    save_template("./assets/blender/result.blend")
-    
-    print("Current scene:", scene.name)
-    print("Sample:", scene.elements.blocks[2].timeline.stages[6].text.text)
-    
+    blender_file.save("./assets/blender/result.blend")
     

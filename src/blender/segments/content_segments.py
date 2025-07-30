@@ -51,7 +51,7 @@ class ContentSegment(Segment):
         self.audio = self.new_audio_strip(
             name="main_audio",
             data={
-                "filepath": data["audio"]
+                "filepath": data["audio_path"]
             },
             channel=channel,
             frame_start=frame_start
@@ -64,7 +64,7 @@ class ContentSegment(Segment):
         # background
         channel = channel + 1
         self.background = self.new_clip_strip(
-            bg_path=data.get("background"), 
+            bg_path=data.get("background_path", None), 
             channel=channel, 
             frame_start=frame_start,
             frame_end=timeline_frame_start,
@@ -73,9 +73,9 @@ class ContentSegment(Segment):
         # title
         channel = channel + 1
         self.title = self.create_title(
-            data=data["title"],
+            text=data["title"],
             channel=channel,
-            name=f"title",
+            name=f"title.{index}",
             frame_start=frame_start + 50,
             frame_end=timeline_frame_start
         )
@@ -101,7 +101,7 @@ class ContentSegment(Segment):
         
         # timeline
         channel = channel + 1
-        stages = timeline_data["process_stages"]
+        stages = timeline_data["bill_process_stages"]
         current_stage_index = timeline_data["bill_process_step"]
         
         # timeline 
@@ -263,11 +263,11 @@ class ContentSegment(Segment):
             position=[320,  250 - 130 * (index + 1)]
         )
         
-    def create_title(self, data, name, channel, frame_start, frame_end):
+    def create_title(self, text, name, channel, frame_start, frame_end):
         return self.render_text_rect_asset(
             scene=next(s for s in bpy.data.scenes if s.name == "title"),
-            text=data["text"],
-            name=name,
+            text=text,
+            name=f"{self.name}.{name}",
             channel=channel,
             frame_start=frame_start,
             frame_end=frame_end,

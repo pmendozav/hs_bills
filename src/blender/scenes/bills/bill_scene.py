@@ -32,7 +32,7 @@ class BillScene:
         
         # content segments
         frame_current = frame_start
-        content_segments_data = data.get("content", [])
+        content_segments_data = data.get("segments", [])
         self.n_block_segments = len(content_segments_data)
         for index in range(0, self.n_block_segments):
             content_segment = ContentSegment(
