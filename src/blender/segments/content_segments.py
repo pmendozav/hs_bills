@@ -296,6 +296,9 @@ class ContentSegment(Segment):
             meta.frame_final_duration = frame_duration
             text_strip = next((s for s in meta.strips if s.type == "TEXT"), None)
             text_strip.text = stage
+            
+            for strip in meta.strips:
+                strip.frame_final_end = meta.frame_final_end
         
         # remove unnecessary strips
         for meta in metas[current_stage_index:]:

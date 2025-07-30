@@ -29,6 +29,7 @@ class Segment:
         bpy.context.window.scene = scene
         
         bpy.context.scene.render.use_sequencer = True
+        scene.render.image_settings.file_format = 'PNG'
         bpy.ops.render.render(animation=False, write_still=True)
         filepath = scene.render.filepath
         
