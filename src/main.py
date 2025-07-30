@@ -11,9 +11,10 @@ from blender.scenes.bills.bill_scene import BillScene
 
 import debugpy
 
-debugpy.listen(("localhost", 5678))
-print("Waiting for debugger attach...")
-debugpy.wait_for_client()
+if "--no-debug" not in sys.argv:
+    debugpy.listen(("localhost", 5678))
+    print("Waiting for debugger attach...")
+    debugpy.wait_for_client()
 
 def save_template(filepath):
     blender_file = BlenderFile()

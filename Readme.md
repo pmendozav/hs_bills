@@ -24,8 +24,13 @@ assets/
 2. **Run the Script**  
    Use the following command to run your script in Blender's background mode:
    ```sh
-   /Applications/Blender.app/Contents/MacOS/Blender --background --python src/main.py
-   ```
+  /Applications/Blender.app/Contents/MacOS/Blender --background --python src/main.py -- --no-debug
+  ```
+
+  Debug mode:
+  ```sh
+  /Applications/Blender.app/Contents/MacOS/Blender --background --python src/main.py
+  ```
 
 ---
 
@@ -53,7 +58,7 @@ debugpy.wait_for_client()
 
 ### 3. Configure VS Code
 
-In `.vscode/launch.json`, add:
+Create or add the follwing into `.vscode/launch.json`:
 
 ```json
 {
@@ -68,6 +73,36 @@ In `.vscode/launch.json`, add:
                 "port": 5678
             },
             "justMyCode": false
+        }
+    ]
+}
+```
+
+Create or add the follwing into `.vscode/tasks.json`:
+
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Blender Script",
+            "type": "shell",
+            "command": "/Applications/Blender.app/Contents/MacOS/Blender",
+            "args": [
+                "--background",
+                "--python",
+                "${workspaceFolder}/src/main.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
         }
     ]
 }
