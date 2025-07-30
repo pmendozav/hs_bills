@@ -11,11 +11,12 @@ class OpeningSegment(Segment):
             name="opening"
             )
         
-        self.background = self.new_clip_strip(
+        self.background, channel, _ = self.new_clip_strip(
             bg_path=data.get("background"), 
             channel=channel, 
             frame_start=0, 
-            name="background")
+            name="background",
+            has_audio=True)
         self.frame_end = self.background.frame_final_end
         self.last_channel = channel
 
@@ -28,11 +29,12 @@ class ClosingSegment(Segment):
             name="closing"
             )
         
-        self.background = self.new_clip_strip(
+        self.background, channel, _ = self.new_clip_strip(
             bg_path=data.get("background"), 
             channel=channel, 
             frame_start=frame_start, 
-            name="background")
+            name="background",
+            has_audio=True)
         self.frame_end = self.background.frame_final_end
         self.last_channel = channel
 
@@ -63,7 +65,7 @@ class ContentSegment(Segment):
         
         # background
         channel = channel + 1
-        self.background = self.new_clip_strip(
+        self.background, _, _ = self.new_clip_strip(
             bg_path=data.get("background_path", None), 
             channel=channel, 
             frame_start=frame_start,
@@ -237,7 +239,7 @@ class ContentSegment(Segment):
         # filepath = "/tmp/timeline.mp4"
         
         # bpy.context.window.scene = self.scene
-        strip = self.new_clip_strip(
+        strip, _, _ = self.new_clip_strip(
             bg_path=filepath,
             channel=channel, 
             frame_start=frame_start,

@@ -79,7 +79,7 @@ class Segment:
                 
         return strip
         
-    def new_clip_strip(self, bg_path, channel, name, frame_start=0, frame_end=None):
+    def new_clip_strip(self, bg_path, channel, name, frame_start=0, frame_end=None, has_audio=False):
         strip = self.scene.sequence_editor.sequences.new_movie(
             name=f"{self.name}.{name}",
             filepath=bg_path,
@@ -90,7 +90,21 @@ class Segment:
         if frame_end is not None:
             strip.frame_final_end = frame_end
         
-        return strip
+        audio_strip = None
+        if has_audio:
+            try:
+                audio_strip = self.scene.sequence_editor.sequences.new_sound(
+                    name=f"{self.name}.{name}.audio",
+                    filepath=bg_path,
+                    channel=channel + 1,
+                    frame_start=frame_start
+                )
+                if frame_end is not None:
+                    audio_strip.frame_final_end = frame_end
+            except RuntimeError as e:
+                print(f"[Warning] Cannot load audio from {bg_path}: {e}")
+            channel += 1
+        return strip, channel, audio_strip
         
     def new_audio_strip(self, data, name, channel, frame_start):
         filepath = data["filepath"]
