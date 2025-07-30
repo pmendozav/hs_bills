@@ -171,7 +171,7 @@ class ContentSegment(Segment):
             name="timeline.clip"
         )
         
-        hearing_date_data = timeline_data.get("hearing_date", None)
+        hearing_date_data = data.get("hearing_date", None)
         if hearing_date_data:
             channel = channel + 1
             self.timeline["hearing_date"] = self.create_hearing_date(
@@ -217,10 +217,17 @@ class ContentSegment(Segment):
         original_offset_x = strip.transform.offset_x
         
         width = 1280
-        image_name = strip.elements[0].filename
-        image = bpy.data.images.get(image_name)
-        if image:
-            width = image.size[0] * strip.transform.scale_x
+        if strip.type == 'IMAGE':
+            image_name = strip.elements[0].filename
+            image = bpy.data.images.get(image_name)
+            if image:
+                width = image.size[0] * strip.transform.scale_x
+        elif strip.type == 'TEXT':
+            font_size = strip.font_size
+            text = strip.text
+            width = font_size * 0.75 * len(text)
+        else:
+            raise ValueError(f"Unsupported strip type for shift animation: {strip.type}")
         
         offset = (1280 + width) / 2
         if (slide_from_left):
